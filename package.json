@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/xangelaz/tinyapp/issues"
   },
-  "homepage": "https://github.com/xangelaz/tinyapp#readme"
+  "homepage": "https://github.com/xangelaz/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
