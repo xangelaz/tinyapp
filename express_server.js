@@ -57,7 +57,7 @@ app.get("/set", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
-  console.log("gjhk", longURL)
+  // console.log("gjhk", longURL)
   res.redirect(longURL);
 });
 
@@ -67,9 +67,14 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log("req.body: ", req.body); // Log the POST request body to the console
+  // console.log("req.body: ", req.body); // Log the POST request body to the console
   let r = generateRandomString();
   urlDatabase[r] = req.body.longURL 
   res.redirect(`/urls/${r}`); 
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+  console.log("urldatabase.id: ", urlDatabase[req.params.id]);
+  delete urlDatabase[req.params.id];
+  res.redirect(`/urls`);
+});
