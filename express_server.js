@@ -10,7 +10,7 @@ const urlDatabase = {
 };
 
 function generateRandomString() {
-  let r = (Math.random() + 1).toString(36).slice(2, 8);
+  let r = Math.random().toString(36).slice(2, 8);
   console.log("random", r);
   return r
 }
@@ -67,14 +67,27 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  // console.log("req.body: ", req.body); // Log the POST request body to the console
+  console.log("created new URL: ", req.body); // Log the POST request body to the console
+  
   let r = generateRandomString();
   urlDatabase[r] = req.body.longURL 
   res.redirect(`/urls/${r}`); 
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  console.log("urldatabase.id: ", urlDatabase[req.params.id]);
+  console.log("/urls/:id/delete ", urlDatabase[req.params.id]);
   delete urlDatabase[req.params.id];
+  res.redirect(`/urls`);
+});
+
+app.post("/urls/:id/edit", (req, res) => {
+  console.log("clicking edit button ", urlDatabase[req.params.id]);
+  res.redirect(`/urls/${req.params.id}`);
+});
+
+app.post("/editURL/:id", (req, res) => {
+  console.log("/editURL/:id, longUrl: ", urlDatabase[req.params.id]);
+  console.log("/editURL/:id, req.body: ", req.body.newURL)
+  urlDatabase[req.params.id] = req.body.newURL;
   res.redirect(`/urls`);
 });
