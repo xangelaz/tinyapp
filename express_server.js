@@ -105,7 +105,13 @@ app.post("/editURL/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  console.log("/urls/login ", req.body.username);
+  console.log("/login ", req.body.username);
   res.cookie("username", req.body.username);
+  res.redirect(`/urls`);
+});
+
+app.post("/logout", (req, res) => {
+  console.log("/logout ", req.body.username);
+  res.clearCookie("username", req.body.username);
   res.redirect(`/urls`);
 });
