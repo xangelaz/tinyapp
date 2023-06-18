@@ -16,11 +16,12 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <td><form method="POST" action="/login">
+        <form method="POST" action="/login">
           <input name="username" value= "Username" />
           </label>
           <button type="submit">Login</button>
-        </form></td>
+        </form>
+        <p> <%= username %> </p>
       </div>
     </div>
   </nav>
