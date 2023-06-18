@@ -117,9 +117,36 @@ app.post("/editURL/:id", (req, res) => {
   res.redirect(`/urls`);
 });
 
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
 app.post("/login", (req, res) => {
-  console.log("/login ", req.body.username);
-  // res.cookie("username", req.body.username);
+  const email = req.body.email;
+  const password = req.body.password;
+
+  if (!email || !password) {
+    return res.status(400).send('Please provide an email and password');
+  }
+
+  let foundUser = null;
+  for (const userId in users) {
+    const user = users[userId];
+    if (user.email === email) {
+      foundUser = user;
+    }
+  }
+
+  if (!foundUser) {
+    return res.status(400).send('No account with that email found');
+  }
+
+  if (foundUser.password !== password) {
+    return res.status(400).send('Passwords do not match');
+  }
+
+  res.cookie('userId', foundUser.id);
+  console.log("/login ", req.body.email);
   res.redirect(`/urls`);
 });
 
