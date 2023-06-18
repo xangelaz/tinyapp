@@ -11,6 +11,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+
 const generateRandomString = function() {
   let r = Math.random().toString(36).slice(2, 8);
   console.log("random", r);
@@ -115,3 +116,12 @@ app.post("/logout", (req, res) => {
   res.clearCookie("username", req.body.username);
   res.redirect(`/urls`);
 });
+
+app.get('/register', (req, res) => {
+  res.render('register');
+});
+
+// app.post("/register", (req, res) => {
+//   console.log("/register ", req.body.username);
+//   res.redirect(`/urls`);
+// });
