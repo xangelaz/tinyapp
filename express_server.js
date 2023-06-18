@@ -18,7 +18,10 @@ function generateRandomString() {
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { 
+    urls: urlDatabase, 
+    username: req.cookies["username"] 
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -89,5 +92,11 @@ app.post("/editURL/:id", (req, res) => {
   console.log("/editURL/:id, longUrl: ", urlDatabase[req.params.id]);
   console.log("/editURL/:id, req.body: ", req.body.newURL)
   urlDatabase[req.params.id] = req.body.newURL;
+  res.redirect(`/urls`);
+});
+
+app.post("/login", (req, res) => {
+  console.log("/urls/login ", req.body.username);
+  res.cookie("username", req.body.username);
   res.redirect(`/urls`);
 });
