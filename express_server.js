@@ -125,7 +125,7 @@ app.post("/login", (req, res) => {
 
 app.post("/logout", (req, res) => {
   console.log("/logout ", req.body.username);
-  res.clearCookie("username", req.body.email);
+  res.clearCookie("username", req.body.username);
   res.redirect(`/urls`);
 });
 
@@ -136,6 +136,22 @@ app.get('/register', (req, res) => {
 app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+
+  if (!email || !password) {
+    return res.status(400).send('Please provide both an email and password');
+  }
+
+  let foundUser = null;
+  for (const userId in users) {
+    const user = users[userId];
+    if (user.email === email) {
+      foundUser = user;
+    }
+  }
+
+  if (foundUser) {
+    return res.status(400).send('There is already an account with that email');
+  }
 
   const id = Math.random().toString(36).substring(2, 5);
 
