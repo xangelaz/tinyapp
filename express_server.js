@@ -138,22 +138,22 @@ app.post("/login", (req, res) => {
   }
 
   if (!foundUser) {
-    return res.status(400).send('No account with that email found');
+    return res.status(403).send('No account with that email found');
   }
 
   if (foundUser.password !== password) {
-    return res.status(400).send('Passwords do not match');
+    return res.status(403).send('Passwords do not match');
   }
 
-  res.cookie('userId', foundUser.id);
+  res.cookie('user_id', foundUser.id);
   console.log("/login ", req.body.email);
   res.redirect(`/urls`);
 });
 
 app.post("/logout", (req, res) => {
-  console.log("/logout ", req.body.username);
-  res.clearCookie("username", req.body.username);
-  res.redirect(`/urls`);
+  console.log("/logout ", req.body.email);
+  res.clearCookie('user_id');
+  res.redirect(`/login`);
 });
 
 app.get('/register', (req, res) => {
