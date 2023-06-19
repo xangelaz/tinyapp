@@ -30,6 +30,15 @@ const generateRandomString = function() {
   return r;
 };
 
+const findExistingUser = function(email) {
+  for (const userId in users) {
+    const user = users[userId];
+    if (user.email === email) {
+      return user;
+    }
+  }
+};
+
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/urls", (req, res) => {
@@ -73,11 +82,17 @@ app.get('/shortenURL', (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const templateVars = {user: users[req.cookies["user_id"]]};
+  if (!req.cookies["user_id"]) {
+    res.redirect('/login');
+  }
   res.render("urls_new", templateVars);
 });
 
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
+  if (!longURL) {
+    return res.status(404).send('This short URL does not exist');
+  }
   // console.log("gjhk", longURL)
   res.redirect(longURL);
 });
@@ -92,8 +107,10 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log("created new URL: ", req.body); // Log the POST request body to the console
-  
+  console.log("creating new URL: ", req.body); // Log the POST request body to the console
+  if (!req.cookies["user_id"]) {
+    return res.status(400).send('Must have an account and log in to shorten URLs');
+  }
   let r = generateRandomString();
   urlDatabase[r] = req.body.longURL;
   res.redirect(`/urls/${r}`);
@@ -118,6 +135,9 @@ app.post("/editURL/:id", (req, res) => {
 });
 
 app.get('/login', (req, res) => {
+  if (req.cookies["user_id"]) {
+    res.redirect('urls');
+  }
   res.render('login');
 });
 
@@ -129,13 +149,7 @@ app.post("/login", (req, res) => {
     return res.status(400).send('Please provide an email and password');
   }
 
-  let foundUser = null;
-  for (const userId in users) {
-    const user = users[userId];
-    if (user.email === email) {
-      foundUser = user;
-    }
-  }
+  let foundUser = findExistingUser(email);
 
   if (!foundUser) {
     return res.status(403).send('No account with that email found');
@@ -157,6 +171,9 @@ app.post("/logout", (req, res) => {
 });
 
 app.get('/register', (req, res) => {
+  if (req.cookies["user_id"]) {
+    res.redirect('urls');
+  }
   res.render('register');
 });
 
@@ -168,13 +185,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send('Please provide both an email and password');
   }
 
-  let foundUser = null;
-  for (const userId in users) {
-    const user = users[userId];
-    if (user.email === email) {
-      foundUser = user;
-    }
-  }
+  let foundUser = findExistingUser(email);
 
   if (foundUser) {
     return res.status(400).send('There is already an account with that email');
