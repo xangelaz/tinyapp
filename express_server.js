@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const express = require("express");
 const cookieSession = require("cookie-session");
-const { getUserByEmail, verifyRequest, generateRandomString, urlsForUser } = require("./helpers");
+const { getUserByEmail, createHTMLMessage, verifyRequest, generateRandomString, urlsForUser } = require("./helpers");
 
 const app = express();
 const PORT = 8080;
@@ -42,12 +42,11 @@ const users = {
   },
 };
 
-
-
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+//landing page, redirects to /urls if user is logged in, otherwise redirects to /login
 app.get("/", (req, res) => {
   const user = users[req.session["user_id"]];
 
@@ -58,12 +57,13 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
+//checking if user is logged in to then show list of urls
 app.get("/urls", (req, res) => {
   const userID = req.session["user_id"];
   const user = users[userID];
 
   if (!user) {
-    return res.status(404).send("Please log in or register first");
+    return res.status(404).send(createHTMLMessage("Please log in or register first"));
   } else {
     const templateVars = {
       urls: urlsForUser(userID, urlDatabase),
@@ -74,23 +74,6 @@ app.get("/urls", (req, res) => {
   }
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
-});
- 
-app.get("/fetch", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
-});
 
 app.get("/urls/new", (req, res) => {
   const templateVars = { user: users[req.session["user_id"]] };
@@ -106,7 +89,7 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id].longURL;
 
   if (!longURL) {
-    return res.status(404).send("This short URL does not exist");
+    return res.status(404).send(createHTMLMessage("This short URL does not exist"));
   }
 
   res.redirect(longURL);
@@ -127,7 +110,7 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls", (req, res) => {
   if (!req.session["user_id"]) {
-    return res.status(400).send("Must have an account and log in to shorten URLs");
+    return res.status(400).send(createHTMLMessage("Must have an account and log in to shorten URLs"));
   }
 
   const r = generateRandomString();
@@ -174,19 +157,19 @@ app.post("/login", (req, res) => {
 
   //checking if user provided an email and password
   if (!email || !password) {
-    return res.status(400).send("Please provide an email and password");
+    return res.status(400).send(createHTMLMessage("Please provide an email and password"));
   }
 
   const foundUser = getUserByEmail(email, users);
 
   //checking if the email entered is registered
   if (!foundUser) {
-    return res.status(400).send("No account with that email found");
+    return res.status(400).send(createHTMLMessage("No account with that email found"));
   }
 
   //checking if password entered is the same as registered password
   if (!bcrypt.compareSync(password, foundUser.password)) {
-    return res.status(400).send("Passwords do not match");
+    return res.status(400).send(createHTMLMessage("Passwords do not match"));
   }
 
   res.cookie("user_id", foundUser.id);
@@ -217,14 +200,14 @@ app.post("/register", (req, res) => {
 
   //checking if user provided an email and password
   if (!email || !password) {
-    return res.status(400).send("Please provide both an email and password");
+    return res.status(400).send(createHTMLMessage("Please provide both an email and password"));
   }
 
   const foundUser = getUserByEmail(email, users);
 
   //checking if email entered is already registered
   if (foundUser) {
-    return res.status(400).send("There is already an account with that email");
+    return res.status(400).send(createHTMLMessage("There is already an account with that email"));
   }
 
   //creates new user object
