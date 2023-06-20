@@ -10,9 +10,9 @@ const getUserByEmail = function(email, database) {
 };
 
 //turning all error messages to HTML
-const createHTMLMessage = function (string) {
+const createHTMLMessage = function(string) {
   return `<html><body>${string}</body></html>\n`;
-}
+};
 
 const verifyRequest = function(req, res, users, urlDatabase) {
   const userID = req.session["user_id"];
