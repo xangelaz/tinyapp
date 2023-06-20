@@ -96,7 +96,7 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
-//completes all verifyRequest checks, then creates templateVars object
+//completes all verifyRequest checks, then renders url detail page
 app.get("/urls/:id", (req, res) => {
   if (verifyRequest(req, res, users, urlDatabase)) {
 
@@ -156,37 +156,36 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  //checking if user provided an email and password
+  //checks if user provided an email and password
   if (!email || !password) {
     return res.status(400).send(createHTMLMessage("Please provide an email and password"));
   }
 
   const foundUser = getUserByEmail(email, users);
 
-  //checking if the email entered is registered
+  //checks if the email entered is registered
   if (!foundUser) {
     return res.status(400).send(createHTMLMessage("No account with that email found"));
   }
 
-  //checking if password entered is the same as registered password
+  //checks if password entered is the same as registered password
   if (!bcrypt.compareSync(password, foundUser.password)) {
     return res.status(400).send(createHTMLMessage("Passwords do not match"));
   }
 
-  //creates cookie and session
-  res.cookie("user_id", foundUser.id);
+  //creates session cookie
   req.session["user_id"] = foundUser.id;
   res.redirect(`/urls`);
 });
 
-//clears the users cookie and session, redirects to /login
+//clears the user cookie and session, redirects to /login
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   req.session = null;
   res.redirect(`/login`);
 });
 
-//checking if user logged in, if so, redirect to urls, otherwise go to register page
+//checks if user logged in, if so, redirect to urls, otherwise go to register page
 app.get("/register", (req, res) => {
   const user = users[req.session["user_id"]];
 
@@ -201,14 +200,14 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  //checking if user provided an email and password
+  //checks if user provided an email and password
   if (!email || !password) {
     return res.status(400).send(createHTMLMessage("Please provide both an email and password"));
   }
 
   const foundUser = getUserByEmail(email, users);
 
-  //checking if email entered is already registered
+  //checks if email entered is already registered
   if (foundUser) {
     return res.status(400).send(createHTMLMessage("There is already an account with that email"));
   }
