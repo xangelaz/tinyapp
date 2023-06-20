@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const cookieParser = require("cookie-parser");
 const express = require("express");
 const cookieSession = require("cookie-session");
+const { getUserByEmail } = require('./helpers')
 
 const app = express();
 const PORT = 8080; // default port 8080
@@ -16,7 +17,6 @@ app.use(cookieSession({
 
   maxAge: 24 * 60 * 60 * 1000
 }))
-
 
 const urlDatabase = {
   b6UTxQ: {
@@ -47,24 +47,6 @@ const generateRandomString = function() {
   console.log("random", r);
   return r;
 };
-
-const getUserByEmail = function(email, database) {
-  for (const userId in database) {
-    const user = users[userId];
-    if (user.email === email) {
-      return user;
-    }
-  }
-};
-
-// const getUserByEmail = function(email, database) {
-//   for (const userId in users) {
-//     const user = users[userId];
-//     if (user.email === email) {
-//       return user;
-//     }
-//   }
-// };
 
 const urlsForUser = function(id) {
   const userURLs = {};
@@ -216,7 +198,8 @@ app.post("/login", (req, res) => {
     return res.status(400).send('Please provide an email and password');
   }
 
-  let foundUser = getUserByEmail(email, users);
+  let foundUser = getUserByEmail(email, users) 
+
   console.log(foundUser);
 
   if (!foundUser) {
@@ -258,7 +241,9 @@ app.post("/register", (req, res) => {
     return res.status(400).send('Please provide both an email and password');
   }
 
-  let foundUser = getUserByEmail(email, users);
+  let foundUser = getUserByEmail((email, users) => {
+    
+  });
 
   if (foundUser) {
     return res.status(400).send('There is already an account with that email');
