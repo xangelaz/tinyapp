@@ -57,7 +57,7 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
-//checking if user is logged in to then show list of urls
+//checks if user is logged in to then show list of urls
 app.get("/urls", (req, res) => {
   const userID = req.session["user_id"];
   const user = users[userID];
@@ -74,7 +74,7 @@ app.get("/urls", (req, res) => {
   }
 });
 
-
+//checks if user is logged in, redirects to /login if not logged in
 app.get("/urls/new", (req, res) => {
   const templateVars = { user: users[req.session["user_id"]] };
 
@@ -85,6 +85,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
+//checks if the long url is in database, if not returns message, if so redirects to long url website
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id].longURL;
 
@@ -95,6 +96,7 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
+//completes all verifyRequest checks, then creates templateVars object
 app.get("/urls/:id", (req, res) => {
   if (verifyRequest(req, res, users, urlDatabase)) {
 
@@ -108,6 +110,7 @@ app.get("/urls/:id", (req, res) => {
   }
 });
 
+//checks if user is logged in, if so, creates new short url and redirects to urls/shorturl
 app.post("/urls", (req, res) => {
   if (!req.session["user_id"]) {
     return res.status(400).send(createHTMLMessage("Must have an account and log in to shorten URLs"));
@@ -120,6 +123,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${r}`);
 });
 
+//completes all checks of verifyRequest, deletes the short url object and redirects to /urls
 app.post("/urls/:id/delete", (req, res) => {
   if (verifyRequest(req, res, users, urlDatabase)) {
     delete urlDatabase[req.params.id];
@@ -128,11 +132,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 });
 
-app.post("/urls/:id/edit", (req, res) => {
-  res.redirect(`/urls/${req.params.id}`);
-});
-
-
+//completes all checks of verifyRequest, replaces the long url with the entered url, redirects to /urls
 app.post("/urls/:id", (req, res) => {
   if (verifyRequest(req, res, users, urlDatabase)) {
     urlDatabase[req.params.id].longURL = req.body.newURL;
@@ -141,6 +141,7 @@ app.post("/urls/:id", (req, res) => {
   }
 });
 
+//checks if user is logged in, if so, will redirect to urls, otherwise goes to /login
 app.get("/login", (req, res) => {
   const user = users[req.session["user_id"]];
 
@@ -172,18 +173,20 @@ app.post("/login", (req, res) => {
     return res.status(400).send(createHTMLMessage("Passwords do not match"));
   }
 
+  //creates cookie and session
   res.cookie("user_id", foundUser.id);
   req.session["user_id"] = foundUser.id;
   res.redirect(`/urls`);
 });
 
+//clears the users cookie and session, redirects to /login
 app.post("/logout", (req, res) => {
-  //clears the users cookie
   res.clearCookie("user_id");
   req.session = null;
   res.redirect(`/login`);
 });
 
+//checking if user logged in, if so, redirect to urls, otherwise go to register page
 app.get("/register", (req, res) => {
   const user = users[req.session["user_id"]];
 
