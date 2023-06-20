@@ -48,14 +48,23 @@ const generateRandomString = function() {
   return r;
 };
 
-const findExistingUser = function(email) {
-  for (const userId in users) {
+const getUserByEmail = function(email, database) {
+  for (const userId in database) {
     const user = users[userId];
     if (user.email === email) {
       return user;
     }
   }
 };
+
+// const getUserByEmail = function(email, database) {
+//   for (const userId in users) {
+//     const user = users[userId];
+//     if (user.email === email) {
+//       return user;
+//     }
+//   }
+// };
 
 const urlsForUser = function(id) {
   const userURLs = {};
@@ -207,7 +216,7 @@ app.post("/login", (req, res) => {
     return res.status(400).send('Please provide an email and password');
   }
 
-  let foundUser = findExistingUser(email);
+  let foundUser = getUserByEmail(email, users);
   console.log(foundUser);
 
   if (!foundUser) {
@@ -249,7 +258,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send('Please provide both an email and password');
   }
 
-  let foundUser = findExistingUser(email);
+  let foundUser = getUserByEmail(email, users);
 
   if (foundUser) {
     return res.status(400).send('There is already an account with that email');
