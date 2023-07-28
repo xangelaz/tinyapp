@@ -6,7 +6,7 @@ const { getUserByEmail, createHTMLMessage, verifyRequest, generateRandomString, 
 const app = express();
 const PORT = 8080;
 
-// configuration
+//configuration
 app.set("view engine", "ejs");
 
 //middleware
@@ -14,7 +14,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: "session",
   keys: ["secretkey", "anothersecretkey", "etc"],
-
   maxAge: 24 * 60 * 60 * 1000
 }));
 
@@ -76,23 +75,24 @@ app.get("/urls", (req, res) => {
 
 //checks if user is logged in, redirects to /login if not logged in
 app.get("/urls/new", (req, res) => {
-  const templateVars = { user: users[req.session["user_id"]] };
 
   if (!req.session["user_id"]) {
     res.redirect("/login");
   }
-
+  
+  const templateVars = { user: users[req.session["user_id"]] };
   res.render("urls_new", templateVars);
 });
 
 //checks if the long url is in database, if not returns message, if so redirects to long url website
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id].longURL;
+  const urlDatabaseEntry = urlDatabase[req.params.id];
 
-  if (!longURL) {
+  if (!urlDatabaseEntry) {
     return res.status(404).send(createHTMLMessage("This short URL does not exist"));
   }
 
+  const longURL = urlDatabaseEntry.longURL;
   res.redirect(longURL);
 });
 
