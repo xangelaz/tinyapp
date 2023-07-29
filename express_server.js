@@ -67,8 +67,11 @@ app.get("/urls", (req, res) => {
   if (!user) {
     // return res.status(404).send(createHTMLMessage("Please log in or register first"));
     return res.status(404).send(
-      createHTMLMessage(`
-        Please log in or register first
+      createHTMLMessage(`Please 
+        <a link="nav-link" href="/login"> login </a>
+        or
+        <a link="nav-link" href="/register"> register </a>
+        first
     `));
   } else {
     const templateVars = {
