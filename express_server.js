@@ -68,9 +68,9 @@ app.get("/urls", (req, res) => {
     // return res.status(404).send(createHTMLMessage("Please log in or register first"));
     return res.status(404).send(
       createHTMLMessage(`Please 
-        <a link="nav-link" href="/login"> login </a>
+        <a link="nav-link" href="/login"> login</a>
         or
-        <a link="nav-link" href="/register"> register </a>
+        <a link="nav-link" href="/register"> register</a>
         first
     `));
   } else {

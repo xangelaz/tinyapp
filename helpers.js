@@ -20,7 +20,12 @@ const verifyRequest = function(req, res, users, urlDatabase) {
 
   //checks if user is logged in
   if (!user) {
-    res.status(403).send(createHTMLMessage("Please log in or register first"));
+    res.status(403).send(createHTMLMessage(`Please 
+    <a link="nav-link" href="/login"> login</a>
+    or
+    <a link="nav-link" href="/register"> register</a>
+    first
+`));
     return false;
   }
 
