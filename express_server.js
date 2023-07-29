@@ -17,6 +17,7 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000
 }));
 
+//example database object
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
@@ -28,6 +29,7 @@ const urlDatabase = {
   },
 };
 
+//example users object
 const users = {
   abc: {
     id: "abc",
@@ -42,7 +44,7 @@ const users = {
 };
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`Tinyapp listening on port ${PORT}!`);
 });
 
 //landing page, redirects to /urls if user is logged in, otherwise redirects to /login
@@ -50,7 +52,8 @@ app.get("/", (req, res) => {
   const user = users[req.session["user_id"]];
 
   if (user) {
-    return res.redirect("/urls");
+    res.redirect("/urls");
+    return;
   }
 
   res.redirect("/login");
@@ -62,7 +65,11 @@ app.get("/urls", (req, res) => {
   const user = users[userID];
 
   if (!user) {
-    return res.status(404).send(createHTMLMessage("Please log in or register first"));
+    // return res.status(404).send(createHTMLMessage("Please log in or register first"));
+    return res.status(404).send(
+      createHTMLMessage(`
+        Please log in or register first
+    `));
   } else {
     const templateVars = {
       urls: urlsForUser(userID, urlDatabase),
@@ -78,8 +85,9 @@ app.get("/urls/new", (req, res) => {
 
   if (!req.session["user_id"]) {
     res.redirect("/login");
+    return;
   }
-  
+
   const templateVars = { user: users[req.session["user_id"]] };
   res.render("urls_new", templateVars);
 });
@@ -116,11 +124,11 @@ app.post("/urls", (req, res) => {
     return res.status(400).send(createHTMLMessage("Must have an account and log in to shorten URLs"));
   }
 
-  const r = generateRandomString();
+  const shortURL = generateRandomString();
 
-  urlDatabase[r] = {longURL: req.body.longURL, userID: req.session["user_id"]};
+  urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.session["user_id"]};
 
-  res.redirect(`/urls/${r}`);
+  res.redirect(`/urls/${shortURL}`);
 });
 
 //completes all checks of verifyRequest, deletes the short url object and redirects to /urls
@@ -128,7 +136,7 @@ app.post("/urls/:id/delete", (req, res) => {
   if (verifyRequest(req, res, users, urlDatabase)) {
     delete urlDatabase[req.params.id];
 
-    res.redirect(`/urls`);
+    res.redirect("/urls");
   }
 });
 
@@ -137,19 +145,24 @@ app.post("/urls/:id", (req, res) => {
   if (verifyRequest(req, res, users, urlDatabase)) {
     urlDatabase[req.params.id].longURL = req.body.newURL;
 
-    res.redirect(`/urls`);
+    res.redirect("/urls");
   }
 });
 
-//checks if user is logged in, if so, will redirect to urls, otherwise goes to /login
+//checks if user is logged in, if so, will redirect to /urls, otherwise goes to /login
 app.get("/login", (req, res) => {
   const user = users[req.session["user_id"]];
 
   if (user) {
     res.redirect("urls");
+    return;
   }
 
-  res.render("login");
+  const templateVars = {
+    user
+  };
+
+  res.render("login", templateVars);
 });
 
 app.post("/login", (req, res) => {
@@ -175,14 +188,14 @@ app.post("/login", (req, res) => {
 
   //creates session cookie
   req.session["user_id"] = foundUser.id;
-  res.redirect(`/urls`);
+  res.redirect("/urls");
 });
 
 //clears the user cookie and session, redirects to /login
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   req.session = null;
-  res.redirect(`/login`);
+  res.redirect("/login");
 });
 
 //checks if user logged in, if so, redirect to urls, otherwise go to register page
@@ -191,9 +204,14 @@ app.get("/register", (req, res) => {
 
   if (user) {
     res.redirect("urls");
+    return;
   }
 
-  res.render("register");
+  const templateVars = {
+    user
+  };
+
+  res.render("register", templateVars);
 });
 
 app.post("/register", (req, res) => {
@@ -226,5 +244,5 @@ app.post("/register", (req, res) => {
   users[id] = newUser;
 
   res.cookie("user_id", newUser.id);
-  res.redirect(`/login`);
+  res.redirect("/login");
 });
