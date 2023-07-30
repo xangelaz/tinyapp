@@ -103,6 +103,7 @@ app.get("/u/:id", (req, res) => {
     return res.status(404).send(createHTMLMessage("This short URL does not exist"));
   }
 
+  urlDatabaseEntry.visits ++;
   const longURL = urlDatabaseEntry.longURL;
   res.redirect(longURL);
 });
@@ -115,6 +116,7 @@ app.get("/urls/:id", (req, res) => {
       id: req.params.id,
       longURL: urlDatabase[req.params.id].longURL,
       user: users[req.session["user_id"]],
+      visits: urlDatabase[req.params.id].visits
     };
   
     res.render("urls_show", templateVars);
@@ -129,7 +131,11 @@ app.post("/urls", (req, res) => {
 
   const shortURL = generateRandomString();
 
-  urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.session["user_id"]};
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    userID: req.session["user_id"],
+    visits: 0
+  };
 
   res.redirect(`/urls/${shortURL}`);
 });
