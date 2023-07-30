@@ -1,15 +1,15 @@
 const bcrypt = require("bcryptjs");
 const express = require("express");
+const methodOverride = require('method-override');
 const cookieSession = require("cookie-session");
 const { getUserByEmail, createHTMLMessage, verifyRequest, generateRandomString, urlsForUser } = require("./helpers");
 
 const app = express();
 const PORT = 8080;
 
-//configuration
-app.set("view engine", "ejs");
-
 //middleware
+app.set("view engine", "ejs");
+app.use(methodOverride('_method'));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: "session",
@@ -135,7 +135,7 @@ app.post("/urls", (req, res) => {
 });
 
 //completes all checks of verifyRequest, deletes the short url object and redirects to /urls
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id/delete", (req, res) => {
   if (verifyRequest(req, res, users, urlDatabase)) {
     delete urlDatabase[req.params.id];
 
@@ -144,7 +144,7 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 //completes all checks of verifyRequest, replaces the long url with the entered url, redirects to /urls
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   if (verifyRequest(req, res, users, urlDatabase)) {
     urlDatabase[req.params.id].longURL = req.body.newURL;
 
