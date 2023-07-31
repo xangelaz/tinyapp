@@ -107,7 +107,7 @@ app.get("/u/:id", (req, res) => {
   urlDatabaseEntry.visits ++;
 
   //stretch feature - checks if cookie exists. If not, create session cookie and push to visitors array
-  const userCookie = req.session["user_id"]
+  const userCookie = req.session["user_id"];
 
   if (!req.session && !userCookie) {
     req.session["user_id"] = generateRandomString();
@@ -117,6 +117,10 @@ app.get("/u/:id", (req, res) => {
   if (!urlDatabaseEntry.visitors.includes(userCookie)) {
     urlDatabaseEntry.visitors.push(userCookie);
   }
+  
+  const timestamp = new Date();
+
+  urlDatabaseEntry.timestamp.push(timestamp); 
 
   const longURL = urlDatabaseEntry.longURL;
   res.redirect(longURL);
@@ -131,7 +135,9 @@ app.get("/urls/:id", (req, res) => {
       longURL: urlDatabase[req.params.id].longURL,
       user: users[req.session["user_id"]],
       visits: urlDatabase[req.params.id].visits,
-      visitors: urlDatabase[req.params.id].visitors.length
+      visitors: urlDatabase[req.params.id].visitors.length,
+      visitorID: urlDatabase[req.params.id].userID,
+      timestamp: urlDatabase[req.params.id].timestamp
     };
   
     res.render("urls_show", templateVars);
@@ -150,7 +156,8 @@ app.post("/urls", (req, res) => {
     longURL: req.body.longURL,
     userID: req.session["user_id"],
     visits: 0,
-    visitors: []
+    visitors: [],
+    timestamp: []
   };
 
   res.redirect(`/urls/${shortURL}`);

@@ -34,8 +34,27 @@
             <input name="newURL" value="<%= longURL %>"/>
             </label>
             <button type="submit">Submit</button>
-          
+
       </div>
+    </div>
+    <p>
+      <table class="table text-center">
+        <thead>
+          <tr>
+            <th scope="col">Visitor ID</th>
+            <th scope="col">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let time of timestamp) { %>
+            <tr>
+              <td><%= visitorID %></td>
+              <td><%= time %></td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </p>
     </div>
     <!-- Bootstrap JS -->
     <script
