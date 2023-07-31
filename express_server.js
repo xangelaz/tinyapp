@@ -120,7 +120,7 @@ app.get("/u/:id", (req, res) => {
   
   const timestamp = new Date();
 
-  urlDatabaseEntry.timestamp.push(timestamp); 
+  urlDatabaseEntry.userTimestamps.push({user: userCookie, timestamp});
 
   const longURL = urlDatabaseEntry.longURL;
   res.redirect(longURL);
@@ -136,8 +136,7 @@ app.get("/urls/:id", (req, res) => {
       user: users[req.session["user_id"]],
       visits: urlDatabase[req.params.id].visits,
       visitors: urlDatabase[req.params.id].visitors.length,
-      visitorID: urlDatabase[req.params.id].userID,
-      timestamp: urlDatabase[req.params.id].timestamp
+      userTimestamps: urlDatabase[req.params.id].userTimestamps
     };
   
     res.render("urls_show", templateVars);
@@ -157,7 +156,7 @@ app.post("/urls", (req, res) => {
     userID: req.session["user_id"],
     visits: 0,
     visitors: [],
-    timestamp: []
+    userTimestamps: []
   };
 
   res.redirect(`/urls/${shortURL}`);

@@ -46,10 +46,10 @@
           </tr>
         </thead>
         <tbody>
-          <% for (let time of timestamp) { %>
+          <% for (const userTimestamp of userTimestamps) { %>
             <tr>
-              <td><%= visitorID %></td>
-              <td><%= time %></td>
+              <td><%= userTimestamp.user %></td>
+              <td><%= userTimestamp.timestamp %></td>
             </tr>
           <% } %>
         </tbody>
