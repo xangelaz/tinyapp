@@ -103,7 +103,21 @@ app.get("/u/:id", (req, res) => {
     return res.status(404).send(createHTMLMessage("This short URL does not exist"));
   }
 
+  //stretch feature - incrementing # of visitors to each site
   urlDatabaseEntry.visits ++;
+
+  //stretch feature - checks if cookie exists. If not, create session cookie and push to visitors array
+  const userCookie = req.session["user_id"]
+
+  if (!req.session && !userCookie) {
+    req.session["user_id"] = generateRandomString();
+    urlDatabaseEntry.visitors.push(req.session["user_id"]);
+  }
+  //if session cookie exists, check if included in the visitors array. If not, push into array
+  if (!urlDatabaseEntry.visitors.includes(userCookie)) {
+    urlDatabaseEntry.visitors.push(userCookie);
+  }
+
   const longURL = urlDatabaseEntry.longURL;
   res.redirect(longURL);
 });
@@ -116,7 +130,8 @@ app.get("/urls/:id", (req, res) => {
       id: req.params.id,
       longURL: urlDatabase[req.params.id].longURL,
       user: users[req.session["user_id"]],
-      visits: urlDatabase[req.params.id].visits
+      visits: urlDatabase[req.params.id].visits,
+      visitors: urlDatabase[req.params.id].visitors.length
     };
   
     res.render("urls_show", templateVars);
@@ -134,7 +149,8 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
     userID: req.session["user_id"],
-    visits: 0
+    visits: 0,
+    visitors: []
   };
 
   res.redirect(`/urls/${shortURL}`);
