@@ -118,6 +118,7 @@ app.get("/u/:id", (req, res) => {
     urlDatabaseEntry.visitors.push(userCookie);
   }
   
+  //stretch feature - add timestamp for each short url website visit 
   const timestamp = new Date();
 
   urlDatabaseEntry.userTimestamps.push({user: userCookie, timestamp});
@@ -274,6 +275,7 @@ app.post("/register", (req, res) => {
   //updates the user object
   users[id] = newUser;
 
-  res.cookie("user_id", newUser.id);
-  res.redirect("/login");
+  //creates session cookie
+  req.session["user_id"] = newUser.id;
+  res.redirect("/urls");
 });
